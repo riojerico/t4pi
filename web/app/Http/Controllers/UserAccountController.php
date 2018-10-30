@@ -122,7 +122,7 @@ class UserAccountController extends Controller
           }else{
             $fileName   = '';
           }
-          $drupal_part = DB::table('t4t_drupal_example.participant')->insert(
+          $drupal_part = DB::table('t4t_web.`participants_detail`')->insert(
             [
               'id_part' => $id_user,
               'name' => $request->input('name'),
@@ -179,7 +179,7 @@ class UserAccountController extends Controller
               d.wins,
               b.id as id_user
               FROM t4t_idrelation a join t4t_participant b
-              on a.related_part=b.id left join t4t_drupal_example.`participant` c
+              on a.related_part=b.id left join t4t_web.`participants_detail` c
               on b.id=c.id_part left join t4t_wins d
               on b.id=d.id_retailer
               where a.id_part=? ORDER BY a.repeat_id*1",[$kode]);
