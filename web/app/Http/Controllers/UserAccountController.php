@@ -40,10 +40,18 @@ class UserAccountController extends Controller
     public function store($id,Request $request,FunctionController $Function)
     {
       //cek ID
-      $get_id_user      = $Function->createID();
-      $get_id_user_pls  = $get_id_user[0]->nomor+1;
-      $id_user          = "MF".$get_id_user_pls;
-      
+      // $get_id_user      = $Function->createID();
+      // $get_id_user_pls  = $get_id_user[0]->nomor+1;
+      // $id_user          = "MF".$get_id_user_pls;
+      $get_id_user      = $Function->createID_('MC');
+
+      if (isset($get_id_user[0]->nomor)) {
+        $get_id_user_pls  = $get_id_user[0]->nomor+1;
+      }else{
+        $get_id_user_pls  = 1;
+      }
+      $id_user          = "MC".sprintf("%08d", $get_id_user_pls);
+
       //cek key
       $key = $Function->key($id);
 
@@ -52,17 +60,25 @@ class UserAccountController extends Controller
         return response()->json($key, 401);
       }else{
         $id_part = $key[0]->kode;
+
         //cek repeatID
         $get_repeat_id = $Function->repeatID($id_part);
-        $repeat_id = $get_repeat_id[0]->repeat_id+1;
+
+        if ($get_repeat_id==false) {
+          $repeat_id = 1;
+        }else{
+          $repeat_id = $get_repeat_id[0]->repeat_id+1;
+        }
+
 
 
 
         $validator = Validator::make($request->all(),[
           'name' => 'required',
           'address' => 'required',
-          'phone' => 'required',
-          'email' => 'required|email'
+          'phone' => '',
+          'email' => 'required|email|unique:t4t_participant',
+          'photo' => 'image|mimes:jpeg,bmp,png,gif|max:1000'
         ]);
 
         if ($validator->fails()) {
@@ -75,7 +91,7 @@ class UserAccountController extends Controller
               'type' => 'Donor',
               'name' => $request->input('name'),
               'address' => $request->input('address'),
-              'phone' => $request->input('phone'),
+              'phone' => '-',
               'fax' => '-',
               'director' => '-',
               'pic' => '-',
@@ -99,14 +115,29 @@ class UserAccountController extends Controller
             ]
           );
 
+          if ($request->file('photo')!='') {
+            $file       = $request->file('photo');
+            $fileName   = $file->getClientOriginalName();
+            $request->file('photo')->move("../tester-trees4trees/", date('Ymd-His').'-'.$fileName);
+          }else{
+            $fileName   = '';
+          }
+          $drupal_part = DB::table('t4t_drupal_example.participant')->insert(
+            [
+              'id_part' => $id_user,
+              'name' => $request->input('name'),
+              'photo' => date('Ymd-His').'-'.$fileName
+
+            ]
+          );
+
           //return response()->json(array('participant'=>$t_part,'idrelation'=>$t_relation,'web_part'=>$w_part));
           //return response()->json(array('success'=>$t_part));
           $response = array('success' => true,
             'name' => $request->input('name'),
             'address' => $request->input('address'),
-            'phone' => $request->input('phone'),
             'email' => $request->input('email'),
-            'photo' => '',
+            'photo' => $fileName,
             'id_user' => $id_user
           );
           return $response;
@@ -142,16 +173,16 @@ class UserAccountController extends Controller
             $list_user = DB::connection('mysql')->select("SELECT a.repeat_id,
               b.name,
               b.address,
-              b.phone,
               b.date_join,
               b.email,
               c.photo,
-              d.wins
+              d.wins,
+              b.id as id_user
               FROM t4t_idrelation a join t4t_participant b
               on a.related_part=b.id left join t4t_drupal_example.`participant` c
               on b.id=c.id_part left join t4t_wins d
               on b.id=d.id_retailer
-              where a.id_part=? ",[$kode]);
+              where a.id_part=? ORDER BY a.repeat_id*1",[$kode]);
 
               return response()->json($list_user);
 

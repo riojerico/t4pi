@@ -37,3 +37,4 @@ route::get('wincheck/{wins}/{api}', 'WincheckController@show');
 //See My Trees
 route::post('smt/register', 'seemytreesController@Register');
 route::get('smt/list-user', 'seemytreesController@ListUser');
+route::get('smt/user/{api}/{kode}', 'seemytreesController@GetUser');

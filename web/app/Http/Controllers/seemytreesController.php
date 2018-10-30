@@ -100,5 +100,19 @@ class seemytreesController extends Controller
       return response()->json($data);
     }
 
+    public function GetUser($id)
+    {
+      // //cek key
+      // $key = $Function->key($id);
+      //
+      // if ($key==false) {
+      //   return response()->json($key, 401);
+      // }else{
+      //
+      // }
+        $data = DB::connection('mysql')->select("SELECT * from t4t_t4t.t4t_participant where id=?",[$id]);
+        dd($data);
+        return response()->json($data);
+    }
 
 }

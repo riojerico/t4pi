@@ -58,7 +58,7 @@ class FunctionController extends Controller
               'status' => $request->input('status'),
               'lastlogin' => date("Y-m-d H:i:s"),
               'digawe' => date("Y-m-d H:i:s"),
-              'kode' => $request->input('level').''.date("YmdHis"),
+              'kode' => $request->input('level').''.date("dHis"),
               'API_KEY' => hash::make($request->input('API_KEY')),
               'active' => $request->input('active')
             ]
