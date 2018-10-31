@@ -24,7 +24,7 @@ https://{URL}/general/create-oten
 
 ### 2. Update Oten [PUT]
 ```
-https://{URL}/general/update-oten/{field}/{new one}
+https://{URL}/general/update-oten/{field}/{kode/uname}
 ```
 ![image](https://user-images.githubusercontent.com/6455760/47700364-c6734800-dc48-11e8-8bc3-6e946da40053.png)
 
